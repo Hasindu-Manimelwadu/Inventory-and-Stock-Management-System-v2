@@ -168,4 +168,41 @@ public class StockController {
         // go back to the list page after deleting
         return "redirect:/stock/list";
     }
+    // loads the stock dashboard page with current stock levels
+    @GetMapping("/dashboard")
+    public String showDashboard(Model model) {
+
+        try {
+            // get current stock levels from service
+            List<String[]> stockLevels = stockService.getCurrentStockLevels();
+
+            // get all transactions for the summary counts
+            List<StockTransaction> transactions =
+                    stockService.getAllTransactions();
+
+            // count total stock in and stock out transactions
+            int totalStockIn = 0;
+            int totalStockOut = 0;
+
+            for (StockTransaction t : transactions) {
+                if (t.getTransactionType().equals("STOCK_IN")) {
+                    totalStockIn++;
+                } else {
+                    totalStockOut++;
+                }
+            }
+
+            // send data to the dashboard page
+            model.addAttribute("stockLevels", stockLevels);
+            model.addAttribute("totalStockIn", totalStockIn);
+            model.addAttribute("totalStockOut", totalStockOut);
+            model.addAttribute("totalProducts", stockLevels.size());
+
+        } catch (IOException e) {
+            model.addAttribute("error",
+                    "Failed to load dashboard: " + e.getMessage());
+        }
+
+        return "stockmanagement/stockDashboard";
+    }
 }
