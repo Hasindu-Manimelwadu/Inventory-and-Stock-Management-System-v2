@@ -166,4 +166,61 @@ public class StockService {
         // return null if not found
         return null;
     }
+    // calculates current stock level for each product
+    public List<String[]> getCurrentStockLevels() throws IOException {
+
+        java.util.Map<String, String[]> stockMap =
+                new java.util.LinkedHashMap<>();
+
+        File file = new File(FILE_PATH);
+
+        // return empty list if file does not exist
+        if (!file.exists()) {
+            return new java.util.ArrayList<>(stockMap.values());
+        }
+
+        BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH));
+        String line;
+
+        // read file line by line
+        while ((line = reader.readLine()) != null) {
+
+            line = line.trim();
+            if (line.isEmpty()) continue;
+
+            String[] parts = line.split("\\|", -1);
+            if (parts.length < 6) continue;
+
+            for (int i = 0; i < parts.length; i++) {
+                parts[i] = parts[i].trim();
+            }
+
+            String productId = parts[2];
+            String productName = parts[3];
+            String type = parts[1];
+            int quantity = Integer.parseInt(parts[4]);
+
+            // if product not seen before add it to the map
+            if (!stockMap.containsKey(productId)) {
+                stockMap.put(productId, new String[]{
+                        productId, productName, "0"
+                });
+            }
+
+            // add or subtract quantity based on transaction type
+            String[] entry = stockMap.get(productId);
+            int current = Integer.parseInt(entry[2]);
+
+            if (type.equals("STOCK_IN")) {
+                current += quantity;
+            } else {
+                current -= quantity;
+            }
+
+            entry[2] = String.valueOf(current);
+        }
+
+        reader.close();
+        return new java.util.ArrayList<>(stockMap.values());
+    }
 }
