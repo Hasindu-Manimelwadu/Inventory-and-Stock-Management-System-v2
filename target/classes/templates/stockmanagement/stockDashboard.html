@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Stock Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content">
+    <div class="top-row">
+        <div>
+            <h1 class="page-title">Stock Dashboard</h1>
+            <p class="page-subtitle">Monitor current stock levels and transaction history</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="/stock/add" class="btn-sf btn-purple">+ Add Stock Entry</a>
+            <a href="/stock/list" class="btn-sf btn-secondary">Transaction History</a>
+        </div>
+    </div>
+    <div class="stats-row">
+        <div class="stat-card" style="border-top:4px solid var(--accent-blue);">
+            <h3>Total Products</h3>
+            <p style="color:var(--accent-blue);" th:text="${totalProducts}">0</p>
+        </div>
+        <div class="stat-card" style="border-top:4px solid var(--accent-green);">
+            <h3>Stock In Transactions</h3>
+            <p style="color:var(--accent-green);" th:text="${totalStockIn}">0</p>
+        </div>
+        <div class="stat-card" style="border-top:4px solid var(--accent-red);">
+            <h3>Stock Out Transactions</h3>
+            <p style="color:var(--accent-red);" th:text="${totalStockOut}">0</p>
+        </div>
+    </div>
+    <table class="sf-table">
+        <thead>
+        <tr><th>Product ID</th><th>Product Name</th><th>Current Stock</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="row : ${stockLevels}">
+            <td th:text="${row[0]}" style="color:var(--text-muted);"></td>
+            <td style="font-weight:600;" th:text="${row[1]}"></td>
+            <td th:text="${row[2]}"></td>
+            <td>
+                <span th:class="${row[3] == 'Low Stock' ? 'badge badge-orange' : 'badge badge-green'}" th:text="${row[3]}"></span>
+            </td>
+            <td>
+                <a th:href="@{/stock/add(productId=${row[0]})}" class="btn-sf btn-edit btn-sm" style="margin-right:8px;">Add Stock</a>
+                <a th:href="@{/stock/list(search=${row[0]})}" class="btn-sf btn-secondary btn-sm">View History</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

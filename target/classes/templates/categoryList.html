@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Categories</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content">
+    <div class="top-row">
+        <div>
+            <h1 class="page-title">Categories</h1>
+            <p class="page-subtitle">Track and structure your inventory catalogs hierarchically</p>
+        </div>
+        <a th:href="@{/categories/create}" class="btn-sf btn-purple">+ Add Category</a>
+    </div>
+    <div class="stats-row">
+        <div class="stat-card" style="border-top:4px solid var(--accent-purple);">
+            <h3>Total Categories</h3>
+            <p style="color:var(--accent-purple);" th:text="${totalCount}">0</p>
+        </div>
+        <div class="stat-card" style="border-top:4px solid var(--accent-green);">
+            <h3>Main Classes</h3>
+            <p style="color:var(--accent-green);" th:text="${mainCount}">0</p>
+        </div>
+        <div class="stat-card" style="border-top:4px solid var(--accent-blue);">
+            <h3>Sub Divisions</h3>
+            <p style="color:var(--accent-blue);" th:text="${subCount}">0</p>
+        </div>
+    </div>
+    <table class="sf-table">
+        <thead>
+        <tr><th>ID</th><th>Category</th><th>Description</th><th>Type</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${categories}">
+            <td th:text="${c.id}" style="color:var(--text-muted);"></td>
+            <td style="font-weight:600;" th:text="${c.getDisplayFormat()}"></td>
+            <td th:text="${c.description}" style="color:var(--text-muted);"></td>
+            <td>
+                <span th:class="${c.categoryType == 'MAIN' ? 'badge badge-purple' : 'badge badge-blue'}" th:text="${c.categoryType}"></span>
+            </td>
+            <td>
+                <a th:href="@{/categories/edit(id=${c.id})}" class="btn-sf btn-edit btn-sm" style="margin-right:8px;">Edit</a>
+                <a th:href="@{/categories/delete(id=${c.id})}" class="btn-sf btn-del btn-sm" onclick="return confirm('Delete this category?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

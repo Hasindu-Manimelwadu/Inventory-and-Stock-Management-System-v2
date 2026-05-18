@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Products</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content">
+    <div class="top-row">
+        <div>
+            <h1 class="page-title">Products</h1>
+            <p class="page-subtitle">Track and manage all inventory products</p>
+        </div>
+        <a href="/products/new" class="btn-sf btn-purple">+ Add Product</a>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stats-row">
+        <div class="stat-card" style="border-top:4px solid var(--accent-purple);">
+            <h3>Total Products</h3>
+            <p style="color:var(--accent-purple);" th:text="${totalProducts}">0</p>
+        </div>
+        <div class="stat-card" style="border-top:4px solid var(--accent-green);">
+            <h3>In Stock</h3>
+            <p style="color:var(--accent-green);" th:text="${inStock}">0</p>
+        </div>
+        <div class="stat-card" style="border-top:4px solid var(--accent-orange);">
+            <h3>Low Stock</h3>
+            <p style="color:var(--accent-orange);" th:text="${lowStock}">0</p>
+        </div>
+        <div class="stat-card" style="border-top:4px solid var(--accent-red);">
+            <h3>Out of Stock</h3>
+            <p style="color:var(--accent-red);" th:text="${outOfStock}">0</p>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <form method="get" action="/products" style="display:flex;gap:12px;margin-bottom:25px;">
+        <input type="text" name="keyword" class="search-input" style="margin:0;"
+               placeholder="Search by name, SKU or category..." th:value="${keyword}">
+        <button type="submit" class="btn-sf btn-purple">Search</button>
+        <a th:if="${keyword != null and keyword != ''}"
+           href="/products" class="btn-sf btn-secondary">Clear</a>
+    </form>
+
+    <!-- Table -->
+    <table class="sf-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(products)}">
+            <td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px;">
+                No products found.
+                <a href="/products/new" style="color:var(--accent-purple);">Add the first one</a>.
+            </td>
+        </tr>
+        <tr th:each="p : ${products}">
+            <td th:text="${p.id}" style="color:var(--text-muted);"></td>
+            <td>
+                <div style="font-weight:600;" th:text="${p.name}"></div>
+                <div style="font-size:12px;color:var(--text-muted);"
+                     th:text="${p.description}"></div>
+            </td>
+            <td><span class="badge badge-purple" th:text="${p.sku}"></span></td>
+            <td th:text="${p.category}" style="color:var(--text-muted);"></td>
+            <td th:text="'Rs. ' + ${p.price}"></td>
+            <td th:text="${p.quantity}"></td>
+            <td th:text="${p.type}" style="color:var(--text-muted);"></td>
+            <td>
+                    <span th:class="${p.stockStatus == 'In Stock'  ? 'badge badge-green'  :
+                                      p.stockStatus == 'Low Stock' ? 'badge badge-orange' :
+                                                                      'badge badge-red'}"
+                          th:text="${p.stockStatus}"></span>
+            </td>
+            <td>
+                <a th:href="@{/products/edit/{id}(id=${p.id})}"
+                   class="btn-sf btn-edit btn-sm" style="margin-right:8px;">Edit</a>
+                <a th:href="@{/products/delete/{id}(id=${p.id})}"
+                   class="btn-sf btn-del btn-sm"
+                   onclick="return confirm('Delete this product?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

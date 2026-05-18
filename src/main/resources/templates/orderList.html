@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Purchase Orders</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content">
+    <div class="top-row">
+        <div>
+            <h1 class="page-title">Purchase Orders</h1>
+            <p class="page-subtitle">Track and manage all supplier purchase orders</p>
+        </div>
+        <a href="/createOrder" class="btn-sf btn-purple">+ New Order</a>
+    </div>
+    <div class="stats-row">
+        <div class="stat-card" style="border-top:4px solid var(--accent-purple);">
+            <h3>Total Orders</h3>
+            <p style="color:var(--accent-purple);" th:text="${orders.size()}">0</p>
+        </div>
+    </div>
+    <table class="sf-table">
+        <thead>
+        <tr>
+            <th>PO ID</th>
+            <th>Supplier</th>
+            <th>Date Created</th>
+            <th>Expected Date</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(orders)}">
+            <td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px;">
+                No purchase orders yet.
+                <a href="/createOrder" style="color:var(--accent-purple);">Create your first order</a>.
+            </td>
+        </tr>
+        <tr th:each="o : ${orders}">
+            <td style="color:var(--text-muted);font-family:monospace;" th:text="${o.poId}"></td>
+            <td style="font-weight:600;" th:text="${o.supplierName}"></td>
+            <td th:text="${o.dateCreated}" style="color:var(--text-muted);"></td>
+            <td th:text="${o.expectedDate}" style="color:var(--text-muted);"></td>
+            <td th:text="${o.totalAmount}"></td>
+            <td>
+                    <span th:class="${o.status == 'RECEIVED' ? 'badge badge-green' : (o.status == 'PENDING' ? 'badge badge-orange' : 'badge badge-red')}"
+                          th:text="${o.status}"></span>
+            </td>
+            <td>
+                <a th:href="@{/updateOrder(id=${o.poId})}" class="btn-sf btn-edit btn-sm" style="margin-right:8px;">Update</a>
+                <a th:href="@{/deleteOrder(id=${o.poId})}" class="btn-sf btn-del btn-sm"
+                   onclick="return confirm('Delete this order?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

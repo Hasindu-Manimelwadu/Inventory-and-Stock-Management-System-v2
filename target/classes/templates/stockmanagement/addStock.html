@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Add Stock</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content" style="max-width:560px;">
+    <div style="margin-bottom:25px;">
+        <h1 class="page-title">Add Stock Entry</h1>
+        <p class="page-subtitle">Record a new stock in or stock out transaction</p>
+    </div>
+    <div class="sf-card" style="border-top:4px solid var(--accent-orange);">
+        <form action="/stock/add" method="post">
+            <div class="form-group">
+                <label class="sf-label">Product ID</label>
+                <input type="text" name="productId" class="sf-input" required placeholder="e.g. PRD-001">
+            </div>
+            <div class="form-group">
+                <label class="sf-label">Product Name</label>
+                <input type="text" name="productName" class="sf-input" required placeholder="e.g. Laptop">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group">
+                    <label class="sf-label">Quantity</label>
+                    <input type="number" name="quantity" class="sf-input" required placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="sf-label">Transaction Type</label>
+                    <select name="transactionType" class="sf-input">
+                        <option value="STOCK_IN">STOCK IN</option>
+                        <option value="STOCK_OUT">STOCK OUT</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="sf-label">Date</label>
+                <input type="date" name="date" class="sf-input" required>
+            </div>
+            <div class="form-group">
+                <label class="sf-label">Notes (Optional)</label>
+                <textarea name="notes" class="sf-input" rows="2" placeholder="Additional notes..."></textarea>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:10px;">
+                <button type="submit" class="btn-sf btn-purple">Save Entry</button>
+                <a href="/stock/list" class="btn-sf btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

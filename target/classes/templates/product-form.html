@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Product Form</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content" style="max-width:600px;">
+    <div style="margin-bottom:25px;">
+        <h1 class="page-title" th:text="${pageTitle}">Product Form</h1>
+        <p class="page-subtitle">Manage inventory product details</p>
+    </div>
+    <div class="sf-card" style="border-top:4px solid var(--accent-purple);">
+
+        <form th:action="@{/products/save}" method="post">
+
+            <!-- Hidden ID: 0 = new product, non-zero = edit -->
+            <input type="hidden" name="id" th:value="${product.id}">
+
+            <div class="form-group">
+                <label class="sf-label">Product Name</label>
+                <input type="text" name="name" class="sf-input"
+                       th:value="${product.name}" required placeholder="e.g. Laptop">
+            </div>
+
+            <div class="form-group">
+                <label class="sf-label">SKU</label>
+                <input type="text" name="sku" class="sf-input"
+                       th:value="${product.sku}" required placeholder="e.g. PRD-001">
+            </div>
+
+            <div class="form-group">
+                <label class="sf-label">Category</label>
+                <input type="text" name="category" class="sf-input"
+                       th:value="${product.category}" required placeholder="e.g. Electronics">
+            </div>
+
+            <div class="form-group">
+                <label class="sf-label">Description</label>
+                <textarea name="description" class="sf-input" rows="2"
+                          placeholder="Short description..."
+                          th:text="${product.description}"></textarea>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group">
+                    <label class="sf-label">Price (Rs.)</label>
+                    <input type="number" name="price" class="sf-input"
+                           th:value="${product.price}"
+                           step="0.01" min="0" required placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label class="sf-label">Quantity</label>
+                    <input type="number" name="quantity" class="sf-input"
+                           th:value="${product.quantity}"
+                           min="0" required placeholder="0">
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group">
+                    <label class="sf-label">Product Type</label>
+                    <select name="type" class="sf-input">
+                        <option value="Non-Perishable"
+                                th:selected="${product.type == 'Non-Perishable'}">
+                            Non-Perishable
+                        </option>
+                        <option value="Perishable"
+                                th:selected="${product.type == 'Perishable'}">
+                            Perishable
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="sf-label">Expiry Date (Perishable only)</label>
+                    <input type="date" name="expiryDate" class="sf-input"
+                           th:value="${product.expiryDate}">
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:10px;">
+                <button type="submit" class="btn-sf btn-purple"
+                        th:text="${product.id == 0 ? 'Add Product' : 'Update Product'}">
+                    Save
+                </button>
+                <a href="/products" class="btn-sf btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

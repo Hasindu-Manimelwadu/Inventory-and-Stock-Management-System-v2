@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Suppliers</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content">
+    <div class="top-row">
+        <div>
+            <h1 class="page-title">Supplier Management</h1>
+            <p class="page-subtitle">Manage local and foreign suppliers</p>
+        </div>
+        <a href="/suppliers/register" class="btn-sf btn-purple">+ Add Supplier</a>
+    </div>
+    <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert-danger" th:text="${errorMessage}"></div>
+    <form method="get" action="/suppliers/list" style="display:flex;gap:12px;margin-bottom:25px;">
+        <input type="text" name="keyword" class="search-input" style="margin:0;" placeholder="Search by name or category..." th:value="${keyword}">
+        <button type="submit" class="btn-sf btn-purple">Search</button>
+        <a th:if="${keyword}" href="/suppliers/list" class="btn-sf btn-secondary">Clear</a>
+    </form>
+    <table class="sf-table">
+        <thead>
+        <tr><th>Supplier ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Category</th><th>Type</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(suppliers)}">
+            <td colspan="8" style="text-align:center;color:var(--text-muted);padding:40px;">
+                No suppliers found. <a href="/suppliers/register" style="color:var(--accent-purple);">Add the first one</a>.
+            </td>
+        </tr>
+        <tr th:each="s : ${suppliers}">
+            <td style="color:var(--text-muted);font-family:monospace;" th:text="${s.supplierId}"></td>
+            <td style="font-weight:600;" th:text="${s.name}"></td>
+            <td th:text="${s.email}" style="color:var(--text-muted);"></td>
+            <td th:text="${s.phone}"></td>
+            <td th:text="${s.productCategory}"></td>
+            <td>
+                <span th:class="${s.supplierType == 'Local' ? 'badge badge-green' : 'badge badge-orange'}" th:text="${s.supplierType}"></span>
+            </td>
+            <td>
+                <span th:class="${s.status == 'active' ? 'badge badge-blue' : 'badge badge-red'}" th:text="${s.status}"></span>
+            </td>
+            <td>
+                <a th:href="@{/suppliers/edit(id=${s.supplierId})}" class="btn-sf btn-edit btn-sm" style="margin-right:8px;">Edit</a>
+                <form method="post" action="/suppliers/delete" class="d-inline" style="display:inline;"
+                      th:onsubmit="|return confirm('Delete ${s.name}?')|">
+                    <input type="hidden" name="id" th:value="${s.supplierId}">
+                    <button type="submit" class="btn-sf btn-del btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

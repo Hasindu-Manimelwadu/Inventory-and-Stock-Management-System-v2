@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Users</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content">
+    <div class="top-row">
+        <div>
+            <h1 class="page-title">User Management</h1>
+            <p class="page-subtitle">Manage system administrators and staff accounts</p>
+        </div>
+        <a href="/register" class="btn-sf btn-purple">+ New User</a>
+    </div>
+    <input type="text" class="search-input" placeholder="Search users..." id="searchInput" onkeyup="filterTable()">
+    <table class="sf-table">
+        <thead>
+        <tr><th>User ID</th><th>Username</th><th>Email</th><th>Role</th><th>Permission Level</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${users}">
+            <td th:text="${u.userId}" style="color:var(--text-muted);"></td>
+            <td style="font-weight:600;" th:text="${u.username}"></td>
+            <td th:text="${u.email}" style="color:var(--text-muted);"></td>
+            <td>
+                <span th:class="${u.role == 'ADMIN' ? 'badge badge-purple' : 'badge badge-blue'}" th:text="${u.role}"></span>
+            </td>
+            <td th:text="${u.permissionLevel}" style="color:var(--text-muted);"></td>
+            <td>
+                <a th:href="@{/editUser/{id}(id=${u.userId})}" class="btn-sf btn-edit btn-sm" style="margin-right:8px;">Edit</a>
+                <a th:href="@{/deleteUser/{id}(id=${u.userId})}" class="btn-sf btn-del btn-sm" onclick="return confirm('Delete this user?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    function filterTable() {
+        const val = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.sf-table tbody tr').forEach(r => {
+            r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none';
+        });
+    }
+</script>
+</body>
+</html>

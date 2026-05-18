@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Stock List</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content">
+    <div class="top-row">
+        <div>
+            <h1 class="page-title">Stock Transactions</h1>
+            <p class="page-subtitle">View and manage all stock in and stock out records</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="/stock/add" class="btn-sf btn-purple">+ Add Entry</a>
+            <a href="/stock/dashboard" class="btn-sf btn-secondary">Dashboard</a>
+        </div>
+    </div>
+    <form method="get" action="/stock/list" style="display:flex;gap:12px;margin-bottom:25px;">
+        <input type="text" name="search" class="search-input" style="margin:0;" placeholder="Search by product ID or name..." th:value="${search}">
+        <select name="type" class="sf-input" style="width:180px;">
+            <option value="">All Types</option>
+            <option value="STOCK_IN" th:selected="${type == 'STOCK_IN'}">Stock In</option>
+            <option value="STOCK_OUT" th:selected="${type == 'STOCK_OUT'}">Stock Out</option>
+        </select>
+        <button type="submit" class="btn-sf btn-purple">Search</button>
+    </form>
+    <table class="sf-table">
+        <thead>
+        <tr><th>ID</th><th>Product ID</th><th>Product Name</th><th>Quantity</th><th>Type</th><th>Date</th><th>Notes</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${transactions}">
+            <td th:text="${t.transactionId}" style="color:var(--text-muted);"></td>
+            <td th:text="${t.productId}"></td>
+            <td style="font-weight:600;" th:text="${t.productName}"></td>
+            <td th:text="${t.quantity}"></td>
+            <td>
+                <span th:class="${t.transactionType == 'STOCK_IN' ? 'badge badge-green' : 'badge badge-red'}" th:text="${t.transactionType}"></span>
+            </td>
+            <td th:text="${t.date}" style="color:var(--text-muted);"></td>
+            <td th:text="${t.notes}" style="color:var(--text-muted);"></td>
+            <td>
+                <a th:href="@{/stock/update(id=${t.transactionId})}" class="btn-sf btn-edit btn-sm" style="margin-right:8px;">Edit</a>
+                <a th:href="@{/stock/delete(id=${t.transactionId})}" class="btn-sf btn-del btn-sm" onclick="return confirm('Delete this transaction?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

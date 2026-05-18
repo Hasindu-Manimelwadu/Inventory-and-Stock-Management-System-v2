@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Register Supplier</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content" style="max-width:600px;">
+    <div style="margin-bottom:25px;">
+        <h1 class="page-title">Register Supplier</h1>
+        <p class="page-subtitle">Add a new local or foreign supplier</p>
+    </div>
+    <div class="sf-card" style="border-top:4px solid var(--accent-pink);">
+        <form method="post" action="/suppliers/register">
+            <div class="form-group">
+                <label class="sf-label">Supplier Type</label>
+                <div style="display:flex;gap:25px;margin-top:5px;">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:#e1e2e7;">
+                        <input type="radio" name="type" value="Local" checked onchange="updateExtraField()"> Local Supplier
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:#e1e2e7;">
+                        <input type="radio" name="type" value="Foreign" onchange="updateExtraField()"> Foreign Supplier
+                    </label>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group">
+                    <label class="sf-label">Supplier Name</label>
+                    <input type="text" name="name" class="sf-input" required placeholder="e.g. Perera Traders">
+                </div>
+                <div class="form-group">
+                    <label class="sf-label">Email Address</label>
+                    <input type="email" name="email" class="sf-input" required placeholder="supplier@email.com">
+                </div>
+                <div class="form-group">
+                    <label class="sf-label">Phone Number</label>
+                    <input type="tel" name="phone" class="sf-input" required placeholder="+94 77 123 4567">
+                </div>
+                <div class="form-group">
+                    <label class="sf-label">Product Category</label>
+                    <select name="productCategory" class="sf-input" required>
+                        <option value="">-- Select Category --</option>
+                        <option>Electronics</option>
+                        <option>Food &amp; Beverages</option>
+                        <option>Clothing</option>
+                        <option>Stationery</option>
+                        <option>Hardware</option>
+                        <option>Pharmaceuticals</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="sf-label">Address</label>
+                <textarea name="address" class="sf-input" rows="2" required placeholder="Street, City"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group">
+                    <label class="sf-label" id="extraFieldLabel">District</label>
+                    <input type="text" name="extraField" id="extraField" class="sf-input" placeholder="e.g. Colombo">
+                </div>
+                <div class="form-group">
+                    <label class="sf-label">Status</label>
+                    <select name="status" class="sf-input">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:10px;">
+                <button type="submit" class="btn-sf btn-purple">Register Supplier</button>
+                <a href="/suppliers/list" class="btn-sf btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function updateExtraField() {
+        const isLocal = document.querySelector('input[name="type"][value="Local"]').checked;
+        document.getElementById('extraFieldLabel').textContent = isLocal ? 'District' : 'Country';
+        document.getElementById('extraField').placeholder = isLocal ? 'e.g. Colombo' : 'e.g. India';
+    }
+</script>
+</body>
+</html>

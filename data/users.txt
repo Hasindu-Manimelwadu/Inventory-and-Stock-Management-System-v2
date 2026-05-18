@@ -1,0 +1,2 @@
+USR-1779112670732,Lasitha,thiwankalasitha@gmail.com,123,ADMIN
+USR-1779112692520,Thiwanka,thiwankalasitha@gmail.com,123,STAFF
