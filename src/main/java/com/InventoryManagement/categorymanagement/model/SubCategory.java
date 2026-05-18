@@ -1,4 +1,4 @@
-package com.example.categorymanagement.model;
+package com.InventoryManagement.categorymanagement.model;
 
 public class SubCategory extends Category {
     private String parentCategoryId;

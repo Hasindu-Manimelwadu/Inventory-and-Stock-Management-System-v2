@@ -13,11 +13,6 @@ public class PurchaseOrderController {
 
     private PurchaseOrderService service = new PurchaseOrderService();
 
-    @GetMapping("/")
-    public String home() {
-        return "redirect:/orders";
-    }
-
     @GetMapping("/orders")
     public String viewOrders(Model model) {
         List<PurchaseOrder> orders = service.getAllOrders();

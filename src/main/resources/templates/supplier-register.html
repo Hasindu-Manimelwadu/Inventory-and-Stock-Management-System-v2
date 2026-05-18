@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Supplier</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f4f6f9; }
+        .navbar { background-color: #1a3c5e; }
+        .form-card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 35px; max-width: 700px; margin: 0 auto; }
+        .btn-primary { background-color: #1a3c5e; border-color: #1a3c5e; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark px-4 py-3 mb-4">
+    <span class="navbar-brand fw-bold fs-5"><i class="bi bi-boxes me-2"></i>Inventory &amp; Stock Management</span>
+</nav>
+<div class="container py-2">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/suppliers/list">Suppliers</a></li>
+            <li class="breadcrumb-item active">Register New Supplier</li>
+        </ol>
+    </nav>
+    <div class="form-card">
+        <h4><i class="bi bi-person-plus me-2"></i>Register New Supplier</h4>
+        <form method="post" action="/suppliers/register">
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Supplier Type</label>
+                <div class="d-flex gap-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type" id="typeLocal" value="Local" checked onchange="updateExtraField()">
+                        <label class="form-check-label" for="typeLocal">Local Supplier</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type" id="typeForeign" value="Foreign" onchange="updateExtraField()">
+                        <label class="form-check-label" for="typeForeign">Foreign Supplier</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Supplier Name</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Email Address</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Phone Number</label>
+                    <input type="tel" name="phone" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Product Category</label>
+                    <select name="productCategory" class="form-select" required>
+                        <option value="">-- Select Category --</option>
+                        <option>Electronics</option>
+                        <option>Food &amp; Beverages</option>
+                        <option>Clothing</option>
+                        <option>Stationery</option>
+                        <option>Hardware</option>
+                        <option>Pharmaceuticals</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Address</label>
+                    <textarea name="address" class="form-control" rows="2" required></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" id="extraFieldLabel">District</label>
+                    <input type="text" name="extraField" id="extraField" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Register Supplier</button>
+                <a href="/suppliers/list" class="btn btn-outline-secondary px-4">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function updateExtraField() {
+        const isLocal = document.getElementById('typeLocal').checked;
+        document.getElementById('extraFieldLabel').textContent = isLocal ? 'District' : 'Country';
+        document.getElementById('extraField').placeholder = isLocal ? 'e.g. Colombo' : 'e.g. India';
+    }
+</script>
+</body>
+</html>

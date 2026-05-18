@@ -1,7 +1,7 @@
-package com.example.categorymanagement.controller;
+package com.InventoryManagement.categorymanagement.controller;
 
-import com.example.categorymanagement.model.Category;
-import com.example.categorymanagement.service.CategoryService;
+import com.InventoryManagement.categorymanagement.model.Category;
+import com.InventoryManagement.categorymanagement.service.CategoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

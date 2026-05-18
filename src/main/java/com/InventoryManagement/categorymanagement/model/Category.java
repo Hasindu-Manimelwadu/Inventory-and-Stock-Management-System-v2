@@ -1,4 +1,4 @@
-package com.example.categorymanagement.model;
+package com.InventoryManagement.categorymanagement.model;
 
 public abstract class Category {
     // Encapsulation: Private fields with public accessors

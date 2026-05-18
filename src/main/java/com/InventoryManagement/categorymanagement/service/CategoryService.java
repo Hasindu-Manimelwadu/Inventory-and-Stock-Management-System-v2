@@ -1,8 +1,8 @@
-package com.example.categorymanagement.service;
+package com.InventoryManagement.categorymanagement.service;
 
-import com.example.categorymanagement.model.Category;
-import com.example.categorymanagement.model.MainCategory;
-import com.example.categorymanagement.model.SubCategory;
+import com.InventoryManagement.categorymanagement.model.Category;
+import com.InventoryManagement.categorymanagement.model.MainCategory;
+import com.InventoryManagement.categorymanagement.model.SubCategory;
 import org.springframework.stereotype.Service;
 
 import java.io.*;

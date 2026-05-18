@@ -3,8 +3,11 @@ package com.InventoryManagement.stockmanagement;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-// main class to start the application
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.InventoryManagement",
+        "com.example",
+        "com.inventory"
+})
 public class StockManagementApplication {
     public static void main(String[] args) {
         SpringApplication.run(StockManagementApplication.class, args);
