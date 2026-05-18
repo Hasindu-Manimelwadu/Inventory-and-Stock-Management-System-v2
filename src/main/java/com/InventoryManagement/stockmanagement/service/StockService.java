@@ -9,20 +9,36 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// service class that handles all file operations for stock transactions
 @Service
 public class StockService {
 
-    // path to the text file used to store transactions
     private static final String FILE_PATH = "data/stock_transactions.txt";
 
-    // adds a new transaction to the txt file
+    // Adds a new transaction — prevents STOCK_OUT from going below zero
     public void addTransaction(StockTransaction transaction) throws IOException {
 
-        // read existing transactions to find the highest ID number
         List<StockTransaction> existing = getAllTransactions();
 
-        // find the highest existing ID to avoid duplicates
+        // Validate STOCK_OUT does not exceed available stock
+        if (transaction.getTransactionType().equals("STOCK_OUT")) {
+            int currentStock = 0;
+            for (StockTransaction t : existing) {
+                if (t.getProductId().equals(transaction.getProductId())) {
+                    if (t.getTransactionType().equals("STOCK_IN")) {
+                        currentStock += t.getQuantity();
+                    } else {
+                        currentStock -= t.getQuantity();
+                    }
+                }
+            }
+            if (transaction.getQuantity() > currentStock) {
+                throw new IllegalStateException(
+                        "Insufficient stock. Available: " + currentStock +
+                                ", Requested: " + transaction.getQuantity());
+            }
+        }
+
+        // Generate next unique ID
         int maxId = 0;
         for (StockTransaction t : existing) {
             try {
@@ -30,15 +46,13 @@ public class StockService {
                         t.getTransactionId().replace("TXN-", "").trim());
                 if (num > maxId) maxId = num;
             } catch (NumberFormatException e) {
-                // skip if ID format is unexpected
+                // skip non-numeric IDs
             }
         }
 
-        // new ID is always one higher than current maximum
         String newId = "TXN-" + String.format("%03d", maxId + 1);
         transaction.setTransactionId(newId);
 
-        // open file in append mode so existing data is not lost
         BufferedWriter writer = new BufferedWriter(
                 new FileWriter(FILE_PATH, true));
         writer.write(transaction.toFileString());
@@ -46,13 +60,12 @@ public class StockService {
         writer.close();
     }
 
-    // reads all transactions from the txt file
+    // Reads all transactions from the text file
     public List<StockTransaction> getAllTransactions() throws IOException {
 
         List<StockTransaction> transactions = new ArrayList<>();
         File file = new File(FILE_PATH);
 
-        // return empty list if file does not exist
         if (!file.exists()) {
             return transactions;
         }
@@ -60,31 +73,21 @@ public class StockService {
         BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH));
         String line;
 
-        // read file line by line
         while ((line = reader.readLine()) != null) {
-
-            // trim line to remove trailing spaces and \r characters
             line = line.trim();
-
-            // skip empty lines
             if (line.isEmpty()) continue;
 
-            // -1 keeps trailing empty strings when notes field is empty
             String[] parts = line.split("\\|", -1);
             if (parts.length < 6) continue;
 
-            // trim each part to remove hidden spaces
             for (int i = 0; i < parts.length; i++) {
                 parts[i] = parts[i].trim();
             }
 
-            String type = parts[1];
-            StockTransaction transaction;
-
-            // get notes safely, use empty string if notes field is missing
+            String type  = parts[1];
             String notes = parts.length > 6 ? parts[6].trim() : "";
 
-            // create correct object based on transaction type
+            StockTransaction transaction;
             if (type.equals("STOCK_IN")) {
                 transaction = new StockInTransaction(
                         parts[0], parts[2], parts[3],
@@ -102,14 +105,13 @@ public class StockService {
         return transactions;
     }
 
-    // finds a transaction by id and updates quantity and notes
+    // Updates quantity and notes of an existing transaction
     public void updateTransaction(String transactionId,
                                   int newQuantity,
                                   String newNotes) throws IOException {
 
         List<StockTransaction> transactions = getAllTransactions();
 
-        // find the matching transaction and update it
         for (StockTransaction t : transactions) {
             if (t.getTransactionId().equals(transactionId)) {
                 t.setQuantity(newQuantity);
@@ -118,27 +120,21 @@ public class StockService {
             }
         }
 
-        // write all transactions back to the file
         rewriteFile(transactions);
     }
 
-    // removes a transaction from the txt file by id
+    // Deletes a transaction by ID
     public void deleteTransaction(String transactionId) throws IOException {
 
         List<StockTransaction> transactions = getAllTransactions();
-
-        // remove the transaction that matches the given id
         transactions.removeIf(t -> t.getTransactionId().equals(transactionId));
-
-        // write remaining transactions back to the file
         rewriteFile(transactions);
     }
 
-    // rewrites the entire file with updated list
+    // Rewrites the entire file with the updated list
     private void rewriteFile(List<StockTransaction> transactions)
             throws IOException {
 
-        // false means old content is replaced not appended
         BufferedWriter writer = new BufferedWriter(
                 new FileWriter(FILE_PATH, false));
 
@@ -150,23 +146,19 @@ public class StockService {
         writer.close();
     }
 
-    // finds and returns a single transaction by its id
+    // Finds a single transaction by ID
     public StockTransaction getTransactionById(String transactionId)
             throws IOException {
 
-        List<StockTransaction> transactions = getAllTransactions();
-
-        // loop through and return the matching transaction
-        for (StockTransaction t : transactions) {
+        for (StockTransaction t : getAllTransactions()) {
             if (t.getTransactionId().equals(transactionId)) {
                 return t;
             }
         }
-
-        // return null if not found
         return null;
     }
-    // calculates current stock level for each product
+
+    // Calculates current stock level per product with status
     public List<String[]> getCurrentStockLevels() throws IOException {
 
         java.util.Map<String, String[]> stockMap =
@@ -174,17 +166,14 @@ public class StockService {
 
         File file = new File(FILE_PATH);
 
-        // return empty list if file does not exist
         if (!file.exists()) {
-            return new java.util.ArrayList<>(stockMap.values());
+            return new ArrayList<>(stockMap.values());
         }
 
         BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH));
         String line;
 
-        // read file line by line
         while ((line = reader.readLine()) != null) {
-
             line = line.trim();
             if (line.isEmpty()) continue;
 
@@ -195,32 +184,42 @@ public class StockService {
                 parts[i] = parts[i].trim();
             }
 
-            String productId = parts[2];
+            String productId   = parts[2];
             String productName = parts[3];
-            String type = parts[1];
-            int quantity = Integer.parseInt(parts[4]);
+            String type        = parts[1];
+            int quantity       = Integer.parseInt(parts[4]);
 
-            // if product not seen before add it to the map
             if (!stockMap.containsKey(productId)) {
-                stockMap.put(productId, new String[]{
-                        productId, productName, "0"
-                });
+                // 4-element array: [productId, productName, stockLevel, status]
+                stockMap.put(productId,
+                        new String[]{productId, productName, "0", "In Stock"});
             }
 
-            // add or subtract quantity based on transaction type
             String[] entry = stockMap.get(productId);
-            int current = Integer.parseInt(entry[2]);
+            int current    = Integer.parseInt(entry[2]);
 
             if (type.equals("STOCK_IN")) {
                 current += quantity;
             } else {
-                current -= quantity;
+                // Never go below zero
+                current = Math.max(0, current - quantity);
+            }
+
+            // Determine status based on current stock level
+            String status;
+            if (current <= 0) {
+                status = "Out of Stock";
+            } else if (current <= 5) {
+                status = "Low Stock";
+            } else {
+                status = "In Stock";
             }
 
             entry[2] = String.valueOf(current);
+            entry[3] = status;
         }
 
         reader.close();
-        return new java.util.ArrayList<>(stockMap.values());
+        return new ArrayList<>(stockMap.values());
     }
 }

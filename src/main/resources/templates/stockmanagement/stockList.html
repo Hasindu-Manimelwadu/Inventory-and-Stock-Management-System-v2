@@ -1,157 +1,54 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Stock Transactions</title>
-    <!-- bootstrap for styling -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <style>
-        /* page background color */
-        body { background-color: #f0f4f8; }
-
-        /* green badge for stock in */
-        .badge-STOCK_IN  { background-color: #198754; color: #fff; }
-
-        /* red badge for stock out */
-        .badge-STOCK_OUT { background-color: #dc3545; color: #fff; }
-
-        /* common badge styling */
-        .status-badge { padding: 4px 10px; border-radius: 20px;
-                        font-size: 0.8rem; font-weight: 600; }
-    </style>
+    <title>StockFlow - Stock List</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
 <body>
-<div class="container-fluid mt-4 px-4">
-
-    <!-- page header and add button -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4>📦 Stock Transactions</h4>
-        <div class="d-flex gap-2">
-            <a href="/stock/dashboard"
-               class="btn btn-outline-dark">
-                Dashboard
-            </a>
-            <a href="/stock/add" class="btn btn-primary">
-                + Add Stock Entry
-            </a>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content">
+    <div class="top-row">
+        <div>
+            <h1 class="page-title">Stock Transactions</h1>
+            <p class="page-subtitle">View and manage all stock in and stock out records</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="/stock/add" class="btn-sf btn-purple">+ Add Entry</a>
+            <a href="/stock/dashboard" class="btn-sf btn-secondary">Dashboard</a>
         </div>
     </div>
-
-    <!-- show error message if something goes wrong -->
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
-    <!-- search and filter bar -->
-    <div class="card mb-4 p-3">
-        <form method="get" action="/stock/list">
-            <div class="row g-2">
-
-                <!-- search by product id or name -->
-                <div class="col-md-4">
-                    <input type="text"
-                           class="form-control"
-                           name="search"
-                           th:value="${search}"
-                           placeholder="🔍 Search by Product ID or Name...">
-                </div>
-
-                <!-- filter by transaction type -->
-                <div class="col-md-3">
-                    <select class="form-select" name="type">
-                        <option value="">All Types</option>
-                        <option value="STOCK_IN"
-                                th:selected="${type == 'STOCK_IN'}">
-                            Stock In
-                        </option>
-                        <option value="STOCK_OUT"
-                                th:selected="${type == 'STOCK_OUT'}">
-                            Stock Out
-                        </option>
-                    </select>
-                </div>
-
-                <!-- filter button -->
-                <div class="col-md-2">
-                    <button type="submit"
-                            class="btn btn-outline-primary w-100">
-                        Filter
-                    </button>
-                </div>
-
-                <!-- clear filters button -->
-                <div class="col-md-2">
-                    <a href="/stock/list"
-                       class="btn btn-outline-secondary w-100">
-                        Clear
-                    </a>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <!-- transactions table -->
-    <div class="card">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-dark">
-                <tr>
-                    <th>Transaction ID</th>
-                    <th>Type</th>
-                    <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th>Date</th>
-                    <th>Notes</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-
-                <!-- show message if no transactions found -->
-                <tr th:if="${#lists.isEmpty(transactions)}">
-                    <td colspan="8"
-                        class="text-center text-muted py-4">
-                        No stock transactions found.
-                    </td>
-                </tr>
-
-                <!-- loop through each transaction and show in a row -->
-                <tr th:each="t : ${transactions}">
-                    <td>
-                        <strong th:text="${t.transactionId}"></strong>
-                    </td>
-
-                    <!-- badge color changes based on transaction type -->
-                    <td>
-                        <span th:classappend="'badge-' + ${t.transactionType}"
-                              class="status-badge"
-                              th:text="${t.transactionType}">
-                        </span>
-                    </td>
-                    <td th:text="${t.productId}"></td>
-                    <td th:text="${t.productName}"></td>
-                    <td th:text="${t.quantity}"></td>
-                    <td th:text="${t.date}"></td>
-                    <td th:text="${t.notes}"></td>
-
-                    <!-- update and delete buttons for each row -->
-                    <td>
-                        <a th:href="@{/stock/update(id=${t.transactionId})}"
-                           class="btn btn-sm btn-outline-primary">
-                            Update
-                        </a>
-                        <a th:href="@{/stock/delete(id=${t.transactionId})}"
-                           class="btn btn-sm btn-outline-danger"
-                           onclick="return confirm('Delete this transaction?')">
-                            Delete
-                        </a>
-                    </td>
-                </tr>
-
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <form method="get" action="/stock/list" style="display:flex;gap:12px;margin-bottom:25px;">
+        <input type="text" name="search" class="search-input" style="margin:0;" placeholder="Search by product ID or name..." th:value="${search}">
+        <select name="type" class="sf-input" style="width:180px;">
+            <option value="">All Types</option>
+            <option value="STOCK_IN" th:selected="${type == 'STOCK_IN'}">Stock In</option>
+            <option value="STOCK_OUT" th:selected="${type == 'STOCK_OUT'}">Stock Out</option>
+        </select>
+        <button type="submit" class="btn-sf btn-purple">Search</button>
+    </form>
+    <table class="sf-table">
+        <thead>
+        <tr><th>ID</th><th>Product ID</th><th>Product Name</th><th>Quantity</th><th>Type</th><th>Date</th><th>Notes</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${transactions}">
+            <td th:text="${t.transactionId}" style="color:var(--text-muted);"></td>
+            <td th:text="${t.productId}"></td>
+            <td style="font-weight:600;" th:text="${t.productName}"></td>
+            <td th:text="${t.quantity}"></td>
+            <td>
+                <span th:class="${t.transactionType == 'STOCK_IN' ? 'badge badge-green' : 'badge badge-red'}" th:text="${t.transactionType}"></span>
+            </td>
+            <td th:text="${t.date}" style="color:var(--text-muted);"></td>
+            <td th:text="${t.notes}" style="color:var(--text-muted);"></td>
+            <td>
+                <a th:href="@{/stock/update(id=${t.transactionId})}" class="btn-sf btn-edit btn-sm" style="margin-right:8px;">Edit</a>
+                <a th:href="@{/stock/delete(id=${t.transactionId})}" class="btn-sf btn-del btn-sm" onclick="return confirm('Delete this transaction?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

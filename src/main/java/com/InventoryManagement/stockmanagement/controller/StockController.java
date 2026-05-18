@@ -12,16 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-// controller class that handles all requests for stock management
 @Controller
 @RequestMapping("/stock")
 public class StockController {
 
-    // spring will automatically create and inject the service
     @Autowired
     private StockService stockService;
 
-    // loads all transactions and shows the stock list page
+    // Shows the stock list with optional search and type filter
     @GetMapping("/list")
     public String listTransactions(
             @RequestParam(required = false) String search,
@@ -29,48 +27,40 @@ public class StockController {
             Model model) {
 
         try {
-            // get all transactions from the service
-            List<StockTransaction> transactions =
-                    stockService.getAllTransactions();
+            List<StockTransaction> transactions = stockService.getAllTransactions();
 
-            // filter by search keyword if user typed something
             if (search != null && !search.isEmpty()) {
                 String keyword = search.toLowerCase();
                 transactions = transactions.stream()
-                        .filter(t -> t.getProductId().toLowerCase()
-                                .contains(keyword)
-                                || t.getProductName().toLowerCase()
-                                .contains(keyword))
+                        .filter(t -> t.getProductId().toLowerCase().contains(keyword)
+                                || t.getProductName().toLowerCase().contains(keyword))
                         .toList();
             }
 
-            // filter by transaction type if user selected one
             if (type != null && !type.isEmpty()) {
                 transactions = transactions.stream()
                         .filter(t -> t.getTransactionType().equals(type))
                         .toList();
             }
 
-            // send transactions to the html page
             model.addAttribute("transactions", transactions);
             model.addAttribute("search", search);
             model.addAttribute("type", type);
 
         } catch (IOException e) {
-            model.addAttribute("error",
-                    "Failed to load transactions: " + e.getMessage());
+            model.addAttribute("error", "Failed to load transactions: " + e.getMessage());
         }
 
         return "stockmanagement/stockList";
     }
 
-    // shows the add stock form
+    // Shows the add stock entry form
     @GetMapping("/add")
     public String showAddForm() {
         return "stockmanagement/addStock";
     }
 
-    // handles the form submission when adding a new stock entry
+    // Handles add stock form submission
     @PostMapping("/add")
     public String addTransaction(
             @RequestParam String productId,
@@ -84,7 +74,6 @@ public class StockController {
         try {
             StockTransaction transaction;
 
-            // create stock in or stock out object based on user selection
             if (transactionType.equals("STOCK_IN")) {
                 transaction = new StockInTransaction(
                         "", productId, productName, quantity, date, notes);
@@ -93,46 +82,41 @@ public class StockController {
                         "", productId, productName, quantity, date, notes);
             }
 
-            // save the transaction using the service
             stockService.addTransaction(transaction);
-
-            // go back to the list page after saving
             return "redirect:/stock/list";
 
+        } catch (IllegalStateException e) {
+            // Insufficient stock — show error message on the form
+            model.addAttribute("error", e.getMessage());
+            return "stockmanagement/addStock";
+
         } catch (IOException e) {
-            model.addAttribute("error",
-                    "Failed to save transaction: " + e.getMessage());
+            model.addAttribute("error", "Failed to save transaction: " + e.getMessage());
             return "stockmanagement/addStock";
         }
     }
 
-    // loads the update form with existing transaction data
+    // Shows update form pre-filled with existing transaction data
     @GetMapping("/update")
-    public String showUpdateForm(
-            @RequestParam String id, Model model) {
+    public String showUpdateForm(@RequestParam String id, Model model) {
 
         try {
-            // find the transaction by id to pre fill the form
-            StockTransaction transaction =
-                    stockService.getTransactionById(id);
+            StockTransaction transaction = stockService.getTransactionById(id);
 
-            // if not found go back to list
             if (transaction == null) {
                 return "redirect:/stock/list";
             }
 
-            // send the transaction to the html page
             model.addAttribute("transaction", transaction);
 
         } catch (IOException e) {
-            model.addAttribute("error",
-                    "Failed to load transaction: " + e.getMessage());
+            model.addAttribute("error", "Failed to load transaction: " + e.getMessage());
         }
 
         return "stockmanagement/adjustStock";
     }
 
-    // handles the form submission when updating a stock entry
+    // Handles update stock form submission
     @PostMapping("/update")
     public String updateTransaction(
             @RequestParam String transactionId,
@@ -141,66 +125,48 @@ public class StockController {
             Model model) {
 
         try {
-            // update the transaction using the service
             stockService.updateTransaction(transactionId, quantity, notes);
-
-            // go back to the list page after updating
             return "redirect:/stock/list";
 
         } catch (IOException e) {
-            model.addAttribute("error",
-                    "Failed to update transaction: " + e.getMessage());
+            model.addAttribute("error", "Failed to update transaction: " + e.getMessage());
             return "stockmanagement/adjustStock";
         }
     }
 
-    // handles the delete request when user clicks the delete button
+    // Handles delete transaction request
     @GetMapping("/delete")
     public String deleteTransaction(@RequestParam String id) {
 
         try {
-            // delete the transaction using the service
             stockService.deleteTransaction(id);
         } catch (IOException e) {
             System.out.println("Delete failed: " + e.getMessage());
         }
 
-        // go back to the list page after deleting
         return "redirect:/stock/list";
     }
-    // loads the stock dashboard page with current stock levels
+
+    // Shows the stock dashboard with current stock levels
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
 
         try {
-            // get current stock levels from service
-            List<String[]> stockLevels = stockService.getCurrentStockLevels();
+            List<String[]> stockLevels         = stockService.getCurrentStockLevels();
+            List<StockTransaction> transactions = stockService.getAllTransactions();
 
-            // get all transactions for the summary counts
-            List<StockTransaction> transactions =
-                    stockService.getAllTransactions();
+            long totalStockIn  = transactions.stream()
+                    .filter(t -> t.getTransactionType().equals("STOCK_IN")).count();
+            long totalStockOut = transactions.stream()
+                    .filter(t -> t.getTransactionType().equals("STOCK_OUT")).count();
 
-            // count total stock in and stock out transactions
-            int totalStockIn = 0;
-            int totalStockOut = 0;
-
-            for (StockTransaction t : transactions) {
-                if (t.getTransactionType().equals("STOCK_IN")) {
-                    totalStockIn++;
-                } else {
-                    totalStockOut++;
-                }
-            }
-
-            // send data to the dashboard page
-            model.addAttribute("stockLevels", stockLevels);
-            model.addAttribute("totalStockIn", totalStockIn);
+            model.addAttribute("stockLevels",   stockLevels);
+            model.addAttribute("totalStockIn",  totalStockIn);
             model.addAttribute("totalStockOut", totalStockOut);
             model.addAttribute("totalProducts", stockLevels.size());
 
         } catch (IOException e) {
-            model.addAttribute("error",
-                    "Failed to load dashboard: " + e.getMessage());
+            model.addAttribute("error", "Failed to load dashboard: " + e.getMessage());
         }
 
         return "stockmanagement/stockDashboard";

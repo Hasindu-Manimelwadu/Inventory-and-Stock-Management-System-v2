@@ -3,58 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <title>StockFlow - Add Category</title>
-    <style>
-        :root { --bg-main: #0f111a; --bg-card: #1f2335; --text-main: #fff; --text-muted: #787c99; --accent-purple: #7a5af8; --border: #2b304a; }
-        body { font-family: 'Inter', sans-serif; background:var(--bg-main); color:var(--text-main); display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
-        .box { background:var(--bg-card); border-radius:12px; padding:35px; width:100%; max-width:460px; box-shadow:0 10px 30px rgba(0,0,0,0.3); border:1px solid var(--border); border-top:4px solid var(--accent-purple); }
-        h2 { margin:0 0 5px; font-size:24px; }
-        p.sub { margin:0 0 25px; color:var(--text-muted); font-size:13px; }
-        .group { margin-bottom:20px; }
-        label { display:block; margin-bottom:8px; font-size:12px; font-weight:bold; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
-        input, textarea, select { width:100%; background:var(--bg-main); border:1px solid var(--border); color:#fff; padding:12px 15px; border-radius:8px; font-size:14px; box-sizing:border-box; }
-        input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent-purple); }
-        .btn-submit { background:var(--accent-purple); color:#fff; border:none; padding:14px; width:100%; border-radius:8px; font-weight:bold; font-size:15px; cursor:pointer; margin-top:10px; }
-        .btn-cancel { display:block; text-align:center; color:var(--text-muted); text-decoration:none; margin-top:15px; font-size:13px; }
-        .btn-cancel:hover { color:#fff; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
 <body>
-<div class="box">
-    <h2>Create Category</h2>
-    <p class="sub">Add a new main or sub-category to the system</p>
-    <form th:action="@{/categories/create}" method="post">
-        <div class="group">
-            <label>Category Name</label>
-            <input type="text" name="categoryName" required />
-        </div>
-        <div class="group">
-            <label>Description</label>
-            <textarea name="description" rows="3" required></textarea>
-        </div>
-        <div class="group">
-            <label>Category Type</label>
-            <select name="categoryType" id="typeSelect" required onchange="toggleParent()">
-                <option value="MAIN">MAIN - Top Level</option>
-                <option value="SUB">SUB - Nested Level</option>
-            </select>
-        </div>
-
-        <div class="group" id="parentGroup" style="display:none;">
-            <label>Parent Category</label>
-            <select name="parentCategoryId">
-                <option value="">-- Select Parent --</option>
-                <option th:each="m : ${mainCategories}" th:value="${m.id}" th:text="${m.categoryName}"></option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn-submit">Save Category</button>
-        <a th:href="@{/categories}" class="btn-cancel">Cancel & Go Back</a>
-    </form>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="page-content" style="max-width:520px;">
+    <div style="margin-bottom:25px;">
+        <h1 class="page-title">Create Category</h1>
+        <p class="page-subtitle">Add a new main or sub-category to the system</p>
+    </div>
+    <div class="sf-card" style="border-top:4px solid var(--accent-purple);">
+        <form th:action="@{/categories/create}" method="post">
+            <div class="form-group">
+                <label class="sf-label">Category Name</label>
+                <input type="text" name="categoryName" class="sf-input" required placeholder="Enter category name">
+            </div>
+            <div class="form-group">
+                <label class="sf-label">Description</label>
+                <textarea name="description" class="sf-input" rows="3" required placeholder="Enter description"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="sf-label">Category Type</label>
+                <select name="categoryType" id="typeSelect" class="sf-input" onchange="toggleParent()">
+                    <option value="MAIN">MAIN - Top Level</option>
+                    <option value="SUB">SUB - Nested Level</option>
+                </select>
+            </div>
+            <div class="form-group" id="parentGroup" style="display:none;">
+                <label class="sf-label">Parent Category</label>
+                <select name="parentCategoryId" class="sf-input">
+                    <option value="">-- Select Parent --</option>
+                    <option th:each="m : ${mainCategories}" th:value="${m.id}" th:text="${m.categoryName}"></option>
+                </select>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:10px;">
+                <button type="submit" class="btn-sf btn-purple">Save Category</button>
+                <a th:href="@{/categories}" class="btn-sf btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
-
 <script>
     function toggleParent() {
-        var type = document.getElementById('typeSelect').value;
+        const type = document.getElementById('typeSelect').value;
         document.getElementById('parentGroup').style.display = type === 'SUB' ? 'block' : 'none';
     }
 </script>
