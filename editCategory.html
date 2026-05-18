@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StockFlow - Edit Category</title>
+    <style>
+        :root { --bg-main: #0f111a; --bg-card: #1f2335; --text-main: #fff; --text-muted: #787c99; --accent-blue: #00bfff; --border: #2b304a; }
+        body { font-family: 'Inter', sans-serif; background:var(--bg-main); color:var(--text-main); display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
+        .box { background:var(--bg-card); border-radius:12px; padding:35px; width:100%; max-width:460px; box-shadow:0 10px 30px rgba(0,0,0,0.3); border:1px solid var(--border); border-top:4px solid var(--accent-blue); }
+        h2 { margin:0 0 5px; font-size:24px; }
+        p.sub { margin:0 0 25px; color:var(--text-muted); font-size:13px; }
+        .group { margin-bottom:20px; }
+        label { display:block; margin-bottom:8px; font-size:12px; font-weight:bold; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+        input, textarea { width:100%; background:var(--bg-main); border:1px solid var(--border); color:#fff; padding:12px 15px; border-radius:8px; font-size:14px; box-sizing:border-box; }
+        input:focus, textarea:focus { outline:none; border-color:var(--accent-blue); }
+        input:disabled { background:#161925; color:var(--text-muted); cursor:not-allowed; }
+        .btn-submit { background:var(--accent-blue); color:#fff; border:none; padding:14px; width:100%; border-radius:8px; font-weight:bold; font-size:15px; cursor:pointer; margin-top:10px; }
+        .btn-cancel { display:block; text-align:center; color:var(--text-muted); text-decoration:none; margin-top:15px; font-size:13px; }
+        .btn-cancel:hover { color:#fff; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>Edit Category</h2>
+    <p class="sub">Modify existing category details</p>
+    <form th:action="@{/categories/edit}" method="post">
+
+        <input type="hidden" name="categoryId" th:value="${category.id}" />
+
+        <div class="group">
+            <label>Category ID</label>
+            <input type="text" th:value="${category.id}" disabled />
+        </div>
+
+        <div class="group">
+            <label>Category Name</label>
+            <input type="text" name="categoryName" th:value="${category.categoryName}" required />
+        </div>
+
+        <div class="group">
+            <label>Description</label>
+            <textarea name="description" rows="3" th:text="${category.description}" required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">Update Details</button>
+        <a th:href="@{/categories}" class="btn-cancel">Cancel</a>
+    </form>
+</div>
+</body>
+</html>
